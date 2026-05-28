@@ -1,94 +1,103 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import { loginUser } from "../services/authService"
 
-function LoginPage() {
+const LoginPage = () => {
 
   const navigate = useNavigate()
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] =
+    useState("")
 
-  const [error, setError] = useState("")
+  const [password, setPassword] =
+    useState("")
 
-  const handleLogin = async () => {
+  const handleLogin = async (
+    e: React.FormEvent
+  ) => {
+
+    e.preventDefault()
 
     try {
 
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        {
+      const data =
+        await loginUser(
           email,
           password
-        }
-      )
+        )
 
-      // SAVE JWT TOKEN
+      console.log(data)
+
       localStorage.setItem(
         "token",
-        response.data.token
+        data.token || "loggedin"
       )
 
-      // REDIRECT DASHBOARD
-      navigate("/dashboard")
+      localStorage.setItem(
+        "role",
+        data.role || "ADMIN"
+      )
 
-    } catch (err) {
+      alert("Login Successful")
 
-      setError("Invalid Email or Password")
+      if (
+        data.role === "ADMIN"
+      ) {
+
+        navigate("/dashboard")
+
+      } else {
+
+        navigate("/exam/14")
+
+      }
+
+    } catch (error) {
+
+      console.log(error)
+
+      alert("Login Failed")
     }
   }
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
+    <div className="login-page">
 
-      <div className="bg-[#1e293b] p-10 rounded-2xl w-[400px] border border-gray-800">
+      <form
+        onSubmit={handleLogin}
+        className="login-card"
+      >
 
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Admin Login
-        </h1>
+        <h1>Exam Portal</h1>
 
-        <p className="text-gray-400 mb-8">
-          Welcome back
-        </p>
+        <p>Login to continue</p>
 
-        {/* ERROR */}
-        {
-          error && (
-
-            <div className="bg-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-5">
-              {error}
-            </div>
-          )
-        }
-
-        {/* EMAIL */}
         <input
           type="email"
           placeholder="Enter email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-3 text-white outline-none mb-5"
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
         />
 
-        {/* PASSWORD */}
         <input
           type="password"
           placeholder="Enter password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-3 text-white outline-none mb-6"
+          onChange={(e) =>
+            setPassword(
+              e.target.value
+            )
+          }
         />
 
-        {/* BUTTON */}
-        <button
-          onClick={handleLogin}
-          className="w-full bg-cyan-500 hover:bg-cyan-600 transition py-3 rounded-xl font-bold text-black"
-        >
+        <button type="submit">
           Login
         </button>
 
-      </div>
+      </form>
 
     </div>
   )

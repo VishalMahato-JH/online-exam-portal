@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DashboardLayout from "../layouts/DashboardLayout";
+import toast from "react-hot-toast"
+
 
 type Question = {
   id: number;
@@ -88,12 +90,16 @@ export default function ExamAttemptPage() {
         correctAnswers: score,
       });
 
-      alert(`Exam Submitted Successfully! Score: ${score}`);
+      toast.success(
+        "Exam Submitted Successfully!"
+      )
 
       navigate("/results");
     } catch (error) {
       console.log(error);
-      alert("Failed to submit result");
+      toast.error(
+        "Failed to submit result"
+      )
     }
   };
 
