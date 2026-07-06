@@ -7,6 +7,8 @@ type Exam = {
   title: string;
   duration: number;
   totalMarks: number;
+
+  attempted?: boolean;
 };
 
 function StudentPage() {
@@ -20,22 +22,44 @@ function StudentPage() {
 
   }, []);
 
-  const fetchExams = async () => {
+ const fetchExams = async () => {
 
-    try {
+  try {
 
-      const response = await axios.get(
-        "http://localhost:8080/api/exams"
+    const response =
+      await axios.get(
+        "http://localhost:8081/api/exams"
       );
 
-      setExams(response.data);
+    const email =
+      localStorage.getItem("email");
 
-    } catch (error) {
+    const examsWithStatus =
+      await Promise.all(
 
-      console.log(error);
+        response.data.map(
+          async (exam: Exam) => {
 
-    }
-  };
+            const attempted =
+              await axios.get(
+                `http://localhost:8081/api/results/attempted/${email}/${exam.id}`
+              );
+
+            return {
+              ...exam,
+              attempted: attempted.data,
+            };
+          }
+        )
+      );
+
+    setExams(examsWithStatus);
+
+  } catch (error) {
+
+    console.log(error);
+  }
+};
 
  const handleStartExam = (examId: number) => {
 
@@ -197,27 +221,65 @@ function StudentPage() {
 
                 </div>
 
-                <button
-                  onClick={() => handleStartExam(exam.id)}
-                  className="
-                    w-full
-                    py-4
-                    rounded-2xl
-                    text-xl
-                    font-bold
-                    bg-gradient-to-r
-                    from-cyan-500
-                    to-blue-600
-                    hover:from-cyan-400
-                    hover:to-blue-500
-                    shadow-lg
-                    shadow-cyan-500/20
-                    transition-all
-                    duration-300
-                  "
-                >
-                  Start Exam
-                </button>
+                {exam.attempted ? (
+
+  <div className="space-y-3">
+
+    <div
+      className="
+        text-center
+        py-3
+        rounded-xl
+        bg-green-500/20
+        text-green-400
+        font-bold
+      "
+    >
+      ✓ Already Attempted
+    </div>
+
+    <button
+      onClick={() => window.location.href = "/my-results"}
+      className="
+        w-full
+        py-4
+        rounded-2xl
+        bg-green-500
+        hover:bg-green-600
+        text-white
+        font-bold
+      "
+    >
+      View Result
+    </button>
+
+  </div>
+
+) : (
+
+  <button
+    onClick={() => handleStartExam(exam.id)}
+    className="
+      w-full
+      py-4
+      rounded-2xl
+      text-xl
+      font-bold
+      bg-gradient-to-r
+      from-cyan-500
+      to-blue-600
+      hover:from-cyan-400
+      hover:to-blue-500
+      shadow-lg
+      shadow-cyan-500/20
+      transition-all
+      duration-300
+    "
+  >
+    Start Exam
+  </button>
+
+)}
 
               </div>
 

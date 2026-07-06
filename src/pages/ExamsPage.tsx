@@ -1,48 +1,54 @@
-import {
-  useEffect,
-  useState
-} from "react"
+import { useEffect, useState } from "react";
 
 import DashboardLayout
-  from "../layouts/DashboardLayout"
+  from "../layouts/DashboardLayout";
 
 import {
   getAllExams,
   createExam,
   deleteExam,
-  updateExam
-} from "../services/examService"
+  updateExam,
+} from "../services/examService";
 
 function ExamsPage() {
 
   const [exams, setExams] =
-    useState<any[]>([])
+    useState<any[]>([]);
 
   const [title, setTitle] =
-    useState("")
+    useState("");
 
   const [duration, setDuration] =
-    useState("")
+    useState("");
 
   const [totalMarks, setTotalMarks] =
-    useState("")
+    useState("");
 
   const [editingId, setEditingId] =
-    useState<number | null>(null)
+    useState<number | null>(null);
 
   const fetchExams = async () => {
 
     const data =
-      await getAllExams()
+      await getAllExams();
 
-    setExams(data)
-  }
+    setExams(data);
+  };
 
   useEffect(() => {
 
-    fetchExams()
+    fetchExams();
 
-  }, [])
+  }, []);
+
+  const clearForm = () => {
+
+    setTitle("");
+    setDuration("");
+    setTotalMarks("");
+    setEditingId(null);
+
+  };
 
   const handleSubmit =
     async () => {
@@ -55,87 +61,142 @@ function ExamsPage() {
           Number(duration),
 
         totalMarks:
-          Number(totalMarks)
-      }
+          Number(totalMarks),
+      };
 
       if (editingId) {
 
         await updateExam(
           editingId,
           examData
-        )
+        );
 
-        alert("Exam Updated")
-
-        setEditingId(null)
+        alert(
+          "Exam Updated"
+        );
 
       } else {
 
         await createExam(
           examData
-        )
+        );
 
-        alert("Exam Created")
+        alert(
+          "Exam Created"
+        );
       }
 
-      setTitle("")
-      setDuration("")
-      setTotalMarks("")
+      clearForm();
 
-      fetchExams()
-    }
+      fetchExams();
+    };
 
   const handleDelete =
     async (id: number) => {
 
       try {
 
-        await deleteExam(id)
+        await deleteExam(id);
 
-        alert("Exam Deleted")
+        alert(
+          "Exam Deleted"
+        );
 
-        fetchExams()
+        fetchExams();
 
       } catch {
 
         alert(
           "Delete Failed. Questions/Results linked."
-        )
+        );
       }
-    }
+    };
 
   return (
 
     <DashboardLayout>
 
-      <div className="p-6">
+      <div className="max-w-7xl mx-auto">
 
-        <h1 className="text-4xl font-bold mb-6 text-white">
-          Exams
-        </h1>
+        {/* HEADER */}
 
-        <div className="bg-slate-800 p-4 rounded-xl mb-6">
+        <div className="mb-8">
 
-          <div className="grid grid-cols-3 gap-4">
+          <h1 className="text-5xl font-bold text-white">
+            Exams Management
+          </h1>
+
+          <p className="text-slate-400 text-lg mt-3">
+            Create and manage examination schedules.
+          </p>
+
+        </div>
+
+        {/* FORM */}
+
+        <div
+          className="
+            bg-gradient-to-br
+            from-slate-900
+            to-slate-800
+            border
+            border-slate-700
+            rounded-3xl
+            p-8
+            mb-8
+          "
+        >
+
+          <div
+            className="
+              grid
+              md:grid-cols-3
+              gap-4
+            "
+          >
 
             <input
               type="text"
               placeholder="Exam Title"
               value={title}
               onChange={(e) =>
-                setTitle(e.target.value)
+                setTitle(
+                  e.target.value
+                )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-800
+                border
+                border-slate-700
+                p-4
+                rounded-xl
+                text-white
+                focus:outline-none
+                focus:border-cyan-400
+                transition-all
+              "
             />
 
             <input
               type="number"
-              placeholder="Duration"
+              placeholder="Duration (Minutes)"
               value={duration}
               onChange={(e) =>
-                setDuration(e.target.value)
+                setDuration(
+                  e.target.value
+                )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-800
+                border
+                border-slate-700
+                p-4
+                focus:outline-none
+                focus:border-cyan-400
+                transition-all
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -143,9 +204,21 @@ function ExamsPage() {
               placeholder="Total Marks"
               value={totalMarks}
               onChange={(e) =>
-                setTotalMarks(e.target.value)
+                setTotalMarks(
+                  e.target.value
+                )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-800
+                border
+                border-slate-700
+                p-4
+                focus:outline-none
+                focus:border-cyan-400
+                transition-all
+                rounded-xl
+                text-white
+              "
             />
 
           </div>
@@ -154,53 +227,77 @@ function ExamsPage() {
 
             onClick={handleSubmit}
 
-            className="mt-4 bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-lg text-black font-semibold"
+            className="
+              mt-5
+              px-6
+              py-3
+              rounded-xl
+              bg-cyan-500
+              text-white
+              font-semibold
+              hover:bg-cyan-600
+              shadow-lg
+            "
           >
 
-            {
-              editingId
-                ? "Update Exam"
-                : "Create Exam"
-            }
+            {editingId
+              ? "Update Exam"
+              : "Create Exam"}
 
           </button>
 
         </div>
 
-        <table className="w-full bg-slate-800 rounded-xl overflow-hidden">
+        {/* TABLE */}
 
-          <thead className="bg-slate-900">
+        <div
+          className="
+            bg-gradient-to-br
+            from-slate-900
+            to-slate-800
+            border
+            border-slate-700
+            rounded-3xl
+            overflow-hidden
+          "
+        >
 
-            <tr>
+          <table className="w-full">
 
-              <th className="p-4 text-left">
-                Title
-              </th>
+            <thead className="bg-slate-800">
 
-              <th className="p-4 text-left">
-                Duration
-              </th>
+              <tr>
 
-              <th className="p-4 text-left">
-                Total Marks
-              </th>
+                <th className="p-4 text-left">
+                  Title
+                </th>
 
-              <th className="p-4 text-left">
-                Actions
-              </th>
+                <th className="p-4 text-left">
+                  Duration
+                </th>
 
-            </tr>
+                <th className="p-4 text-left">
+                  Total Marks
+                </th>
 
-          </thead>
+                <th className="p-4 text-left">
+                  Actions
+                </th>
 
-          <tbody>
+              </tr>
 
-            {
-              exams.map((exam) => (
+            </thead>
+
+            <tbody>
+
+              {exams.map((exam) => (
 
                 <tr
                   key={exam.id}
-                  className="border-t border-slate-700"
+                  className="
+                    border-t
+                    border-slate-700
+                  "
                 >
 
                   <td className="p-4">
@@ -208,7 +305,7 @@ function ExamsPage() {
                   </td>
 
                   <td className="p-4">
-                    {exam.duration}
+                    {exam.duration} mins
                   </td>
 
                   <td className="p-4">
@@ -223,22 +320,29 @@ function ExamsPage() {
 
                         setEditingId(
                           exam.id
-                        )
+                        );
 
                         setTitle(
                           exam.title
-                        )
+                        );
 
                         setDuration(
                           exam.duration
-                        )
+                        );
 
                         setTotalMarks(
                           exam.totalMarks
-                        )
+                        );
                       }}
 
-                      className="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg text-black"
+                      className="
+                        px-4
+                        py-2
+                        rounded-lg
+                        border
+                        border-slate-700
+                        hover:bg-slate-800
+                      "
                     >
 
                       Edit
@@ -253,7 +357,14 @@ function ExamsPage() {
                         )
                       }
 
-                      className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-white"
+                      className="
+                        px-4
+                        py-2
+                        rounded-lg
+                        bg-red-500
+                        hover:bg-red-600
+                        text-white
+                      "
                     >
 
                       Delete
@@ -263,17 +374,19 @@ function ExamsPage() {
                   </td>
 
                 </tr>
-              ))
-            }
 
-          </tbody>
+              ))}
 
-        </table>
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 
     </DashboardLayout>
-  )
+  );
 }
 
-export default ExamsPage
+export default ExamsPage;

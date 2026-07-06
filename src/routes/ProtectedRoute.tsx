@@ -1,39 +1,25 @@
-import { Navigate } from "react-router-dom"
+import type { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
 
-type Props = {
-  children: JSX.Element
-  role?: string
+interface Props {
+  children: ReactNode;
+  allowedRole: string;
 }
 
-function ProtectedRoute({
+export default function ProtectedRoute({
   children,
-  role
+  allowedRole,
 }: Props) {
 
-  const token =
-    localStorage.getItem("token")
+  const role = localStorage.getItem("role");
 
-  const userRole =
-    localStorage.getItem("role")
-
-  // NOT LOGGED IN
-
-  if (!token) {
-
-    return <Navigate to="/" />
+  if (!role) {
+    return <Navigate to="/" />;
   }
 
-  // ROLE CHECK
-
-  if (
-    role &&
-    userRole !== role
-  ) {
-
-    return <Navigate to="/" />
+  if (role !== allowedRole) {
+    return <Navigate to="/" />;
   }
 
-  return children
+  return children;
 }
-
-export default ProtectedRoute

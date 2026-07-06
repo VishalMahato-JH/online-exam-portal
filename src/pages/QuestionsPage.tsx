@@ -1,77 +1,64 @@
-import {
-  useEffect,
-  useState
-} from "react"
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-import DashboardLayout
-  from "../layouts/DashboardLayout"
+import DashboardLayout from "../layouts/DashboardLayout";
 
 import {
   createQuestion,
   getQuestionsByExam,
   deleteQuestion,
-  updateQuestion
-} from "../services/questionService"
+  updateQuestion,
+} from "../services/questionService";
 
 import {
-  getAllExams
-} from "../services/examService"
+  getAllExams,
+} from "../services/examService";
 
 function QuestionsPage() {
 
-  const [exams, setExams] =
-    useState<any[]>([])
+  const [exams, setExams] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<any[]>([]);
 
-  const [questions, setQuestions] =
-    useState<any[]>([])
+  const [selectedExam, setSelectedExam] =
+    useState("");
 
-  const [selectedExam,
-    setSelectedExam] =
-    useState("")
+  const [question, setQuestion] =
+    useState("");
 
-  const [question,
-    setQuestion] =
-    useState("")
+  const [option1, setOption1] =
+    useState("");
 
-  const [option1,
-    setOption1] =
-    useState("")
+  const [option2, setOption2] =
+    useState("");
 
-  const [option2,
-    setOption2] =
-    useState("")
+  const [option3, setOption3] =
+    useState("");
 
-  const [option3,
-    setOption3] =
-    useState("")
+  const [option4, setOption4] =
+    useState("");
 
-  const [option4,
-    setOption4] =
-    useState("")
+  const [correctAnswer, setCorrectAnswer] =
+    useState("");
 
-  const [correctAnswer,
-    setCorrectAnswer] =
-    useState("")
+  const [sectionName, setSectionName] =
+    useState("");
 
-  const [sectionName,
-    setSectionName] =
-    useState("")
+  const [marks, setMarks] =
+    useState("");
 
-  const [marks,
-    setMarks] =
-    useState("")
+  const [editingId, setEditingId] =
+    useState<number | null>(null);
 
-  const [editingId,
-    setEditingId] =
-    useState<number | null>(null)
+  const [selectedFile, setSelectedFile] =
+  useState<File | null>(null);
 
   const fetchExams = async () => {
 
     const data =
-      await getAllExams()
+      await getAllExams();
 
-    setExams(data)
-  }
+    setExams(data);
+  };
 
   const fetchQuestions =
     async (examId: number) => {
@@ -79,135 +66,204 @@ function QuestionsPage() {
       const data =
         await getQuestionsByExam(
           examId
-        )
+        );
 
-      setQuestions(data)
-    }
+      setQuestions(data);
+    };
 
   useEffect(() => {
 
-    fetchExams()
+    fetchExams();
 
-  }, [])
+  }, []);
+
+  const clearForm = () => {
+
+    setQuestion("");
+    setOption1("");
+    setOption2("");
+    setOption3("");
+    setOption4("");
+    setCorrectAnswer("");
+    setSectionName("");
+    setMarks("");
+    setEditingId(null);
+
+  };
 
   const handleCreateQuestion =
     async () => {
 
       const questionData = {
 
-  questionText: question,
+        questionText: question,
 
-  option1,
-  option2,
-  option3,
-  option4,
+        option1,
+        option2,
+        option3,
+        option4,
 
-  correctAnswer,
+        correctAnswer,
 
-  sectionName,
+        sectionName,
 
-  marks: Number(marks),
+        marks: Number(marks),
 
-  exam: {
-    id: Number(selectedExam)
-  }
-}
+        exam: {
+          id: Number(selectedExam),
+        },
+      };
 
       if (editingId) {
 
         await updateQuestion(
           editingId,
           questionData
-        )
+        );
 
-        alert("Question Updated")
-
-        setEditingId(null)
+        alert("Question Updated");
 
       } else {
 
-       await createQuestion(
-  questionData
-)
+        await createQuestion(
+          questionData
+        );
 
-        alert("Question Created")
+        alert("Question Created");
       }
 
       fetchQuestions(
         Number(selectedExam)
-      )
+      );
 
-      setQuestion("")
-      setOption1("")
-      setOption2("")
-      setOption3("")
-      setOption4("")
-      setCorrectAnswer("")
-      setSectionName("")
-      setMarks("")
+      clearForm();
+    };
+
+  const uploadExcel = async () => {
+
+    if (!selectedExam) {
+      alert("Select Exam First");
+      return;
     }
+
+    if (!selectedFile) {
+      alert("Select Excel File");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append(
+      "file",
+      selectedFile
+    );
+
+    try {
+
+      await axios.post(
+        `http://localhost:8081/api/questions/upload/${selectedExam}`,
+        formData
+      );
+
+      alert(
+        "Questions Uploaded Successfully"
+      );
+
+      fetchQuestions(
+        Number(selectedExam)
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Upload Failed");
+    }
+  };
 
   const handleDelete =
     async (id: number) => {
 
-      await deleteQuestion(id)
+      await deleteQuestion(id);
 
       fetchQuestions(
         Number(selectedExam)
-      )
-    }
+      );
+    };
 
   return (
 
     <DashboardLayout>
 
-      <div className="p-6">
+      <div className="max-w-7xl mx-auto">
 
-        <h1 className="text-4xl font-bold mb-6">
-          Questions Management
-        </h1>
+        {/* HEADER */}
 
-        <div className="bg-slate-800 p-4 rounded-xl mb-6">
+        <div className="mb-8">
 
-          <div className="grid grid-cols-2 gap-4">
+          <h1 className="text-3xl font-bold text-white">
+            Questions Management
+          </h1>
+
+          <p className="text-slate-400 mt-2">
+            Create and manage examination questions.
+          </p>
+
+        </div>
+
+        {/* FORM */}
+
+        <div
+          className="
+            bg-slate-900
+            border
+            border-slate-800
+            rounded-2xl
+            p-6
+            mb-8
+          "
+        >
+
+          <div className="grid md:grid-cols-2 gap-4">
 
             <select
-
               value={selectedExam}
-
               onChange={(e) => {
 
                 setSelectedExam(
                   e.target.value
-                )
+                );
 
                 fetchQuestions(
                   Number(
                     e.target.value
                   )
-                )
+                );
               }}
-
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             >
 
               <option value="">
                 Select Exam
               </option>
 
-              {
-                exams.map((exam) => (
+              {exams.map((exam) => (
 
-                  <option
-                    key={exam.id}
-                    value={exam.id}
-                  >
+                <option
+                  key={exam.id}
+                  value={exam.id}
+                >
+                  {exam.title}
+                </option>
 
-                    {exam.title}
-
-                  </option>
-                ))
-              }
+              ))}
 
             </select>
 
@@ -220,7 +276,14 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -232,7 +295,14 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -244,7 +314,14 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -256,7 +333,14 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -268,7 +352,14 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -280,7 +371,14 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -292,7 +390,14 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
             <input
@@ -304,64 +409,127 @@ function QuestionsPage() {
                   e.target.value
                 )
               }
-              className="bg-slate-900 border border-slate-700 p-3 rounded-lg text-white"
+              className="
+                bg-slate-950
+                border
+                border-slate-800
+                p-3
+                rounded-xl
+                text-white
+              "
             />
 
           </div>
 
           <button
-
             onClick={
               handleCreateQuestion
             }
-
-            className="mt-4 bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-lg text-black font-semibold"
+            className="
+              mt-5
+              px-6
+              py-3
+              rounded-xl
+              bg-white
+              text-black
+              font-semibold
+              hover:bg-slate-200
+            "
           >
 
-            {
-              editingId
-                ? "Update Question"
-                : "Create Question"
-            }
+            {editingId
+              ? "Update Question"
+              : "Create Question"}
 
           </button>
 
         </div>
 
-        <table className="w-full bg-slate-800 rounded-xl overflow-hidden">
+        <div className="mt-5 flex gap-3 items-center">
 
-          <thead className="bg-slate-900">
+          <input
+            type="file"
+            accept=".xlsx"
+            onChange={(e) =>
+              setSelectedFile(
+                e.target.files?.[0] || null
+              )
+            }
+            className="
+              bg-slate-950
+              border
+              border-slate-800
+              p-2
+              rounded-xl
+              text-white
+            "
+          />
 
-            <tr>
+          <button
+            onClick={uploadExcel}
+            className="
+              px-6
+              py-3
+              rounded-xl
+              bg-green-600
+              text-white
+              font-semibold
+              hover:bg-green-700
+            "
+          >
+            Upload Excel
+          </button>
 
-              <th className="p-4 text-left">
-                Question
-              </th>
+        </div>
 
-              <th className="p-4 text-left">
-                Correct Answer
-              </th>
+        {/* TABLE */}
 
-              <th className="p-4 text-left">
-                Marks
-              </th>
+        <div
+          className="
+            bg-slate-900
+            border
+            border-slate-800
+            rounded-2xl
+            overflow-hidden
+          "
+        >
 
-              <th className="p-4 text-left">
-                Actions
-              </th>
+          <table className="w-full">
 
-            </tr>
+            <thead className="bg-slate-950">
 
-          </thead>
+              <tr>
 
-          <tbody>
+                <th className="p-4 text-left">
+                  Question
+                </th>
 
-            {
-              questions.map((q) => (
+                <th className="p-4 text-left">
+                  Correct Answer
+                </th>
+
+                <th className="p-4 text-left">
+                  Marks
+                </th>
+
+                <th className="p-4 text-left">
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {questions.map((q) => (
 
                 <tr
                   key={q.id}
-                  className="border-t border-slate-700"
+                  className="
+                    border-t
+                    border-slate-800
+                  "
                 >
 
                   <td className="p-4">
@@ -379,78 +547,90 @@ function QuestionsPage() {
                   <td className="p-4 flex gap-2">
 
                     <button
-
                       onClick={() => {
 
-                        setEditingId(q.id)
+                        setEditingId(
+                          q.id
+                        );
 
                         setQuestion(
                           q.questionText
-                        )
+                        );
 
                         setOption1(
                           q.option1
-                        )
+                        );
 
                         setOption2(
                           q.option2
-                        )
+                        );
 
                         setOption3(
                           q.option3
-                        )
+                        );
 
                         setOption4(
                           q.option4
-                        )
+                        );
 
                         setCorrectAnswer(
                           q.correctAnswer
-                        )
+                        );
 
                         setSectionName(
                           q.sectionName
-                        )
+                        );
 
                         setMarks(
                           q.marks
-                        )
+                        );
                       }}
-
-                      className="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg text-black"
+                      className="
+                        px-4
+                        py-2
+                        rounded-lg
+                        border
+                        border-slate-700
+                        hover:bg-slate-800
+                      "
                     >
-
                       Edit
-
                     </button>
 
                     <button
-
                       onClick={() =>
-                        handleDelete(q.id)
+                        handleDelete(
+                          q.id
+                        )
                       }
-
-                      className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-white"
+                      className="
+                        px-4
+                        py-2
+                        rounded-lg
+                        bg-red-500
+                        hover:bg-red-600
+                        text-white
+                      "
                     >
-
                       Delete
-
                     </button>
 
                   </td>
 
                 </tr>
-              ))
-            }
 
-          </tbody>
+              ))}
 
-        </table>
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 
     </DashboardLayout>
-  )
+  );
 }
 
-export default QuestionsPage
+export default QuestionsPage;

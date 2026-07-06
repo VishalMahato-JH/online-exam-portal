@@ -1,1 +1,44 @@
 @import "tailwindcss";
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,
+body,
+#root{
+  width:100%;
+  min-height:100%;
+}
+
+body{
+  font-family: Inter, Arial, sans-serif;
+  background:#020617;
+  color:white;
+}
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#06b6d4;
+  border-radius:20px;
+}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+}
+
+th{
+  background:#111827;
+  font-size:15px;
+}
+
+td,
+th{
+  padding:16px;
+}
