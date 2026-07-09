@@ -28,7 +28,7 @@ function StudentPage() {
 
     const response =
       await axios.get(
-        "http://localhost:8081/api/exams"
+        "https://online-exam-backend-rs3l.onrender.com/api/exams"
       );
 
     const email =
@@ -42,7 +42,7 @@ function StudentPage() {
 
             const attempted =
               await axios.get(
-                `http://localhost:8081/api/results/attempted/${email}/${exam.id}`
+                `https://online-exam-backend-rs3l.onrender.com/api/results/attempted/${email}/${exam.id}`
               );
 
             return {

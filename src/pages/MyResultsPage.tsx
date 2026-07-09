@@ -33,7 +33,7 @@ export default function MyResultsPage() {
 
       const response =
         await axios.get(
-          `http://localhost:8081/api/results/my-results/${email}`
+          `https://online-exam-backend-rs3l.onrender.com/api/results/my-results/${email}`
         );
 
       setResults(response.data);

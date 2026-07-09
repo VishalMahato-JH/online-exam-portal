@@ -32,7 +32,7 @@ export default function ResultsPage() {
 
       const response =
         await axios.get(
-          "http://localhost:8081/api/results/leaderboard"
+          "https://online-exam-backend-rs3l.onrender.com/api/results/leaderboard"
         );
 
       setResults(response.data);
