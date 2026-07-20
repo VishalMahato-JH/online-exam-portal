@@ -77,7 +77,7 @@ export default function ExamAttemptPage() {
 
     const attemptCheck =
       await axios.get(
-        `https://online-exam-backend-rs3l.onrender.com/api/results/attempted/${email}/${id}`
+        `https://online-exam-backend-production-a3ea.up.railway.app/api/results/attempted/${email}/${id}`
       );
 
     if (attemptCheck.data === true) {
@@ -92,7 +92,7 @@ export default function ExamAttemptPage() {
     }
 
     const res = await axios.get(
-      `https://online-exam-backend-rs3l.onrender.com/api/questions/exam/${id}`
+      `https://online-exam-backend-production-a3ea.up.railway.app/api/questions/exam/${id}`
     );
 
     if (Array.isArray(res.data)) {
@@ -164,7 +164,7 @@ export default function ExamAttemptPage() {
     const status =
       percentage >= 40 ? "PASS" : "FAIL";
 
-     await axios.post("https://online-exam-backend-rs3l.onrender.com/api/results/submit", {
+     await axios.post("https://online-exam-backend-production-a3ea.up.railway.app/api/results/submit", {
       studentEmail:
         localStorage.getItem("email") ||
         "student@gmail.com",
