@@ -28,7 +28,7 @@ function StudentPage() {
 
     const response =
       await axios.get(
-        "https://online-exam-backend-production-24cd.up.railway.app/api/exams"
+        "https://online-exam-backend-production-6419.up.railway.app/api/exams"
       );
 
     const email =
@@ -42,7 +42,7 @@ function StudentPage() {
 
             const attempted =
               await axios.get(
-                `https://online-exam-backend-production-24cd.up.railway.app/api/results/attempted/${email}/${exam.id}`
+                `https://online-exam-backend-production-6419.up.railway.app/api/results/attempted/${email}/${exam.id}`
               );
 
             return {

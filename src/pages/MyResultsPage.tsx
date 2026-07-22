@@ -33,7 +33,7 @@ export default function MyResultsPage() {
 
       const response =
         await axios.get(
-          `https://online-exam-backend-production-24cd.up.railway.app/api/results/my-results/${email}`
+          `https://online-exam-backend-production-6419.up.railway.app/api/results/my-results/${email}`
         );
 
       setResults(response.data);

@@ -32,7 +32,7 @@ export default function ResultsPage() {
 
       const response =
         await axios.get(
-          "https://online-exam-backend-production-24cd.up.railway.app/api/results/leaderboard"
+          "https://online-exam-backend-production-6419.up.railway.app/api/results/leaderboard"
         );
 
       setResults(response.data);
